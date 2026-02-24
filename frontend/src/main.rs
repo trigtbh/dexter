@@ -38,8 +38,7 @@ struct Tool {
     description: &'static str,
     category: &'static str,
     endpoint: &'static str,
-    input_label: &'static str,
-    input_hint: &'static str,
+    inputs: &'static [(&'static str, &'static str)], // (label, hint)
 }
 
 const TOOLS: &[Tool] = &[
@@ -49,48 +48,42 @@ const TOOLS: &[Tool] = &[
         description: "Decode a Base64-encoded string",
         category: "ENCODING",
         endpoint: "base64_decode",
-        input_label: "Base64 Input",
-        input_hint: "Paste base64 string here...",
+        inputs: &[("Base64 Input", "Paste base64 string here...")],
     },
     Tool {
         name: "Base64 Encode",
         description: "Encode a string to Base64",
         category: "ENCODING",
         endpoint: "base64_encode",
-        input_label: "Plaintext Input",
-        input_hint: "Text to encode...",
+        inputs: &[("Plaintext Input", "Text to encode...")],
     },
     Tool {
         name: "Hex Decode",
         description: "Decode a hex string to ASCII",
         category: "ENCODING",
         endpoint: "hex_decode",
-        input_label: "Hex Input",
-        input_hint: "e.g. 68656c6c6f...",
+        inputs: &[("Hex Input", "e.g. 68656c6c6f...")],
     },
     Tool {
         name: "Hex Encode",
         description: "Encode ASCII to hex",
         category: "ENCODING",
         endpoint: "hex_encode",
-        input_label: "ASCII Input",
-        input_hint: "Text to hex-encode...",
+        inputs: &[("ASCII Input", "Text to hex-encode...")],
     },
     Tool {
         name: "Binary Decode",
         description: "Decode space-separated binary to ASCII",
         category: "ENCODING",
         endpoint: "binary_decode",
-        input_label: "Binary Input",
-        input_hint: "e.g. 01101000 01100101 01101100...",
+        inputs: &[("Binary Input", "e.g. 01101000 01100101 01101100...")],
     },
     Tool {
         name: "URL Decode",
         description: "Decode a URL-encoded string",
         category: "ENCODING",
         endpoint: "url_decode",
-        input_label: "URL-encoded Input",
-        input_hint: "e.g. hello%20world...",
+        inputs: &[("URL-encoded Input", "e.g. hello%20world...")],
     },
     // Crypto
     Tool {
@@ -98,32 +91,42 @@ const TOOLS: &[Tool] = &[
         description: "Apply ROT13 substitution cipher",
         category: "CRYPTO",
         endpoint: "rot13",
-        input_label: "Input Text",
-        input_hint: "Text to ROT13...",
+        inputs: &[("Input Text", "Text to ROT13...")],
     },
     Tool {
         name: "Caesar Brute-force",
         description: "Try all 25 Caesar cipher shifts, scored by English frequency",
         category: "CRYPTO",
         endpoint: "caesar_brute",
-        input_label: "Ciphertext",
-        input_hint: "Paste ciphertext here...",
+        inputs: &[("Ciphertext", "Paste ciphertext here...")],
     },
     Tool {
         name: "XOR Single-byte",
         description: "Brute-force single-byte XOR key, scored by English IC",
         category: "CRYPTO",
         endpoint: "xor_brute",
-        input_label: "Hex-encoded Ciphertext",
-        input_hint: "e.g. 1b37373331363f78...",
+        inputs: &[("Hex-encoded Ciphertext", "e.g. 1b37373331363f78...")],
     },
     Tool {
         name: "XOR with Key",
         description: "XOR hex input with a repeating hex key",
         category: "CRYPTO",
         endpoint: "xor_key",
-        input_label: "Hex Input :: Hex Key",
-        input_hint: "e.g. 1b3a45::2f1a...",
+        inputs: &[
+            ("Hex Input", "e.g. 1b3a45"),
+            ("Hex Key", "e.g. 2f1a"),
+        ],
+    },
+    Tool {
+        name: "RSA Decrypt (n, e, c)",
+        description: "Decrypt RSA using n, e, and c",
+        category: "CRYPTO",
+        endpoint: "rsa_decrypt",
+        inputs: &[
+            ("Modulus (n)", "e.g. 0x... or 1234..."),
+            ("Exponent (e)", "e.g. 65537"),
+            ("Ciphertext (c)", "e.g. 0x... or 1234..."),
+        ],
     },
     // Forensics
     Tool {
@@ -131,24 +134,59 @@ const TOOLS: &[Tool] = &[
         description: "Extract printable ASCII strings from hex or raw input",
         category: "FORENSICS",
         endpoint: "strings_extract",
-        input_label: "Hex or Raw Input",
-        input_hint: "Paste hex bytes or raw text...",
+        inputs: &[("Hex or Raw Input", "Paste hex bytes or raw text...")],
     },
     Tool {
         name: "File Magic Bytes",
         description: "Identify file type from magic bytes",
         category: "FORENSICS",
         endpoint: "magic_bytes",
-        input_label: "Hex Header (first 16+ bytes)",
-        input_hint: "e.g. ffd8ffe0...",
+        inputs: &[("Hex Header (first 16+ bytes)", "e.g. ffd8ffe0...")],
     },
     Tool {
         name: "LSB Extract",
-        description: "Extract LSB steganography from image (path in /workspace)",
+        description: "Extract LSB steganography from image (hex bytes)",
         category: "FORENSICS",
         endpoint: "lsb_extract",
-        input_label: "Image Path (in /workspace)",
-        input_hint: "e.g. /workspace/challenge.png",
+        inputs: &[("Hex Bytes", "Paste hex bytes (or Ctrl+O)")],
+    },
+    Tool {
+        name: "ZSteg",
+        description: "Powerful steganography detector for PNG/BMP",
+        category: "FORENSICS",
+        endpoint: "zsteg",
+        inputs: &[("Hex Bytes", "Paste file hex bytes (or Ctrl+O)")],
+    },
+    Tool {
+        name: "EXIF Data",
+        description: "Read/write metadata in files",
+        category: "FORENSICS",
+        endpoint: "exiftool",
+        inputs: &[("Hex Bytes", "Paste file hex bytes (or Ctrl+O)")],
+    },
+    Tool {
+        name: "Binwalk",
+        description: "Analyze, extract and identify file signatures",
+        category: "FORENSICS",
+        endpoint: "binwalk",
+        inputs: &[("Hex Bytes", "Paste file hex bytes (or Ctrl+O)")],
+    },
+    Tool {
+        name: "Foremost",
+        description: "Recover files from data using their headers/footers",
+        category: "FORENSICS",
+        endpoint: "foremost",
+        inputs: &[("Hex Bytes", "Paste file hex bytes (or Ctrl+O)")],
+    },
+    Tool {
+        name: "Steghide",
+        description: "Extract data with steghide (requires password)",
+        category: "FORENSICS",
+        endpoint: "steghide",
+        inputs: &[
+            ("Hex Bytes", "Paste hex bytes (or Ctrl+O)"),
+            ("Password", "Enter passphrase"),
+        ],
     },
     // Hashing
     Tool {
@@ -156,24 +194,21 @@ const TOOLS: &[Tool] = &[
         description: "Identify likely hash algorithm from a hash string",
         category: "HASHING",
         endpoint: "hash_identify",
-        input_label: "Hash String",
-        input_hint: "Paste hash here...",
+        inputs: &[("Hash String", "Paste hash here...")],
     },
     Tool {
         name: "MD5 Hash",
         description: "Compute MD5 hash of input",
         category: "HASHING",
         endpoint: "md5",
-        input_label: "Input Text",
-        input_hint: "Text to hash...",
+        inputs: &[("Input Text", "Text to hash...")],
     },
     Tool {
         name: "SHA256 Hash",
         description: "Compute SHA256 hash of input",
         category: "HASHING",
         endpoint: "sha256",
-        input_label: "Input Text",
-        input_hint: "Text to hash...",
+        inputs: &[("Input Text", "Text to hash...")],
     },
 ];
 
@@ -203,8 +238,9 @@ struct App {
     focus: Focus,
     pane: Pane,
     tool_list_state: ListState,
-    input: String,
-    input_cursor: usize,
+    inputs: Vec<String>,
+    input_cursors: Vec<usize>,
+    focused_input: usize,
     output: String,
     status: String,
     status_is_error: bool,
@@ -220,6 +256,10 @@ struct App {
     rect_output: Rect,
     // Actual rendered scroll offset of the tool list (tracked manually)
     list_scroll_offset: usize,
+    // Output selection state (visual/select mode)
+    output_selecting: bool,
+    output_select_start: Option<usize>,
+    output_select_end: usize,
 }
 
 impl App {
@@ -239,8 +279,9 @@ impl App {
             focus: Focus::ToolList,
             pane: Pane::Normal,
             tool_list_state: list_state,
-            input: String::new(),
-            input_cursor: 0,
+            inputs: vec![String::new()],
+            input_cursors: vec![0],
+            focused_input: 0,
             output: String::new(),
             status: String::from("Ready — press ? for help"),
             status_is_error: false,
@@ -254,6 +295,9 @@ impl App {
             rect_input: Rect::default(),
             rect_output: Rect::default(),
             list_scroll_offset: 0,
+            output_selecting: false,
+            output_select_start: None,
+            output_select_end: 0,
         };
 
         app.backend_online = app.check_backend();
@@ -286,17 +330,20 @@ impl App {
             None => return,
         };
 
-        if self.input.trim().is_empty() {
-            self.set_error("Input is empty");
+        if self.inputs.iter().all(|s| s.trim().is_empty()) {
+            self.set_error("All inputs are empty");
             return;
         }
 
         self.status = format!("Running {}...", tool.name);
         self.status_is_error = false;
 
+        // Join multiple inputs with :: for backend compatibility
+        let combined_input = self.inputs.join("::");
+
         let payload = RunRequest {
             tool: tool.endpoint.to_string(),
-            input: self.input.clone(),
+            input: combined_input,
         };
 
         match self
@@ -322,6 +369,43 @@ impl App {
         }
     }
 
+    fn open_file_into_input(&mut self) {
+        // Only implemented for macOS using osascript choose file
+        // Falls back to doing nothing if the chooser fails.
+        if let Ok(output) = std::process::Command::new("osascript")
+            .arg("-e")
+            .arg("POSIX path of (choose file)")
+            .output()
+        {
+            if output.status.success() {
+                if let Ok(path) = String::from_utf8(output.stdout) {
+                    let path = path.trim();
+                    if let Ok(bytes) = std::fs::read(path) {
+                        // convert bytes to hex
+                        let mut s = String::with_capacity(bytes.len() * 2);
+                        for b in &bytes {
+                            s.push_str(&format!("{:02x}", b));
+                        }
+                        // Use the currently focused input field
+                        if let Some(target) = self.inputs.get_mut(self.focused_input) {
+                            *target = s;
+                            self.input_cursors[self.focused_input] = target.len();
+                        }
+                        self.status = format!("Loaded {} ({} bytes)", path, bytes.len());
+                        self.status_is_error = false;
+                        return;
+                    } else {
+                        self.set_error("Failed to read chosen file");
+                    }
+                }
+            } else {
+                self.set_error("File selection cancelled");
+            }
+        } else {
+            self.set_error("File chooser unavailable");
+        }
+    }
+
     fn set_error(&mut self, msg: &str) {
         self.status = msg.to_string();
         self.status_is_error = true;
@@ -341,6 +425,7 @@ impl App {
 
         if !self.filtered_indices.is_empty() {
             self.tool_list_state.select(Some(0));
+            self.clear_input();
         }
     }
 
@@ -359,25 +444,39 @@ impl App {
     }
 
     fn insert_char(&mut self, c: char) {
-        self.input.insert(self.input_cursor, c);
-        self.input_cursor += c.len_utf8();
+        if let Some(s) = self.inputs.get_mut(self.focused_input) {
+            let cursor = &mut self.input_cursors[self.focused_input];
+            s.insert(*cursor, c);
+            *cursor += c.len_utf8();
+        }
     }
 
     fn delete_char(&mut self) {
-        if self.input_cursor > 0 {
-            let prev = self.input[..self.input_cursor]
-                .char_indices()
-                .last()
-                .map(|(i, _)| i)
-                .unwrap_or(0);
-            self.input.remove(prev);
-            self.input_cursor = prev;
+        if let Some(s) = self.inputs.get_mut(self.focused_input) {
+            let cursor = &mut self.input_cursors[self.focused_input];
+            if *cursor > 0 {
+                let prev = s[..*cursor]
+                    .char_indices()
+                    .last()
+                    .map(|(i, _)| i)
+                    .unwrap_or(0);
+                s.remove(prev);
+                *cursor = prev;
+            }
         }
     }
 
     fn clear_input(&mut self) {
-        self.input.clear();
-        self.input_cursor = 0;
+        if let Some(tool) = self.selected_tool() {
+            let n = tool.inputs.len();
+            self.inputs = vec![String::new(); n];
+            self.input_cursors = vec![0; n];
+            self.focused_input = 0;
+        } else {
+            self.inputs = vec![String::new()];
+            self.input_cursors = vec![0];
+            self.focused_input = 0;
+        }
         self.output.clear();
         self.status = String::from("Ready");
         self.status_is_error = false;
@@ -423,6 +522,19 @@ impl App {
         }
     }
 
+    fn clamp_output_scroll(&mut self) {
+        let content_len = self.output.lines().count();
+        let height = self.rect_output.height.saturating_sub(2) as usize;
+        if content_len <= height {
+            self.output_scroll = 0;
+        } else {
+            let max_scroll = (content_len - height) as u16;
+            if self.output_scroll > max_scroll {
+                self.output_scroll = max_scroll;
+            }
+        }
+    }
+
     fn handle_mouse(&mut self, col: u16, row: u16, kind: MouseEventKind) {
         match kind {
             MouseEventKind::Down(MouseButton::Left) => {
@@ -431,6 +543,19 @@ impl App {
                     self.click_tool_at_row(row);
                 } else if Self::hit(self.rect_input, col, row) {
                     self.focus = Focus::Input;
+                    // Switch focused input field based on click row
+                    if let Some(tool) = self.selected_tool() {
+                        let n = tool.inputs.len();
+                        if n > 1 {
+                            let rel_y = row.saturating_sub(self.rect_input.y + 1);
+                            // Each input box takes roughly rect.height / n rows
+                            let field_height = self.rect_input.height.saturating_sub(2) / n as u16;
+                            if field_height > 0 {
+                                let field_idx = (rel_y / field_height) as usize;
+                                self.focused_input = field_idx.min(n - 1);
+                            }
+                        }
+                    }
                 } else if Self::hit(self.rect_output, col, row) {
                     self.focus = Focus::Output;
                 }
@@ -449,6 +574,7 @@ impl App {
                     self.clear_input();
                 } else if Self::hit(self.rect_output, col, row) {
                     self.output_scroll = self.output_scroll.saturating_add(3);
+                    self.clamp_output_scroll();
                 }
             }
             _ => {}
@@ -561,16 +687,26 @@ fn run_app<B: ratatui::backend::Backend>(
                     // Help
                     KeyCode::Char('?') => app.pane = Pane::Help,
 
-                    // Mode toggle
+                    // Mode toggle / Input field switch
                     KeyCode::Tab => {
-                        app.mode = match app.mode {
-                            Mode::Ops => Mode::Recon,
-                            Mode::Recon => Mode::Ops,
-                        };
-                        app.status = match app.mode {
-                            Mode::Ops => String::from("Switched to OPS mode"),
-                            Mode::Recon => String::from("Switched to RECON mode (coming soon)"),
-                        };
+                        if app.focus == Focus::Input {
+                            app.focused_input = (app.focused_input + 1) % app.inputs.len();
+                        } else {
+                            app.mode = match app.mode {
+                                Mode::Ops => Mode::Recon,
+                                Mode::Recon => Mode::Ops,
+                            };
+                            app.status = match app.mode {
+                                Mode::Ops => String::from("Switched to OPS mode"),
+                                Mode::Recon => String::from("Switched to RECON mode (coming soon)"),
+                            };
+                        }
+                    }
+                    KeyCode::BackTab => {
+                        if app.focus == Focus::Input {
+                            let n = app.inputs.len();
+                            app.focused_input = if app.focused_input == 0 { n - 1 } else { app.focused_input - 1 };
+                        }
                     }
 
                     // Search
@@ -590,10 +726,18 @@ fn run_app<B: ratatui::backend::Backend>(
                         app.focus = Focus::ToolList;
                     }
                     KeyCode::Down if app.focus == Focus::Input => {
-                        app.focus = Focus::Output;
+                        if app.focused_input + 1 < app.inputs.len() {
+                            app.focused_input += 1;
+                        } else {
+                            app.focus = Focus::Output;
+                        }
                     }
-                    KeyCode::Up if app.focus == Focus::Output => {
-                        app.focus = Focus::Input;
+                    KeyCode::Up if app.focus == Focus::Input => {
+                        if app.focused_input > 0 {
+                            app.focused_input -= 1;
+                        } else {
+                            app.focus = Focus::ToolList;
+                        }
                     }
 
                     // Tool navigation
@@ -612,16 +756,33 @@ fn run_app<B: ratatui::backend::Backend>(
                         app.focus = Focus::Input;
                     }
 
-                    // Output scroll
+                    // Output scroll/navigation
                     KeyCode::Down if app.focus == Focus::Output => {
-                        app.output_scroll = app.output_scroll.saturating_add(1);
+                        if app.output_selecting {
+                            let lines_count = app.output.lines().count();
+                            let max_idx = lines_count.saturating_sub(1);
+                            app.output_select_end = (app.output_select_end + 1).min(max_idx);
+                        } else {
+                            app.output_scroll = app.output_scroll.saturating_add(1);
+                            app.clamp_output_scroll();
+                        }
                     }
                     KeyCode::Up if app.focus == Focus::Output => {
-                        app.output_scroll = app.output_scroll.saturating_sub(1);
+                        if app.output_selecting {
+                            if app.output_select_end > 0 {
+                                app.output_select_end = app.output_select_end.saturating_sub(1);
+                            }
+                        } else {
+                            if app.output_scroll == 0 {
+                                app.focus = Focus::Input;
+                                app.focused_input = app.inputs.len().saturating_sub(1);
+                            } else {
+                                app.output_scroll = app.output_scroll.saturating_sub(1);
+                            }
+                        }
                     }
 
                     // Input editing
-                    KeyCode::Char(c) if app.focus == Focus::Input => app.insert_char(c),
                     KeyCode::Backspace if app.focus == Focus::Input => app.delete_char(),
                     KeyCode::Char('u')
                         if app.focus == Focus::Input
@@ -629,8 +790,73 @@ fn run_app<B: ratatui::backend::Backend>(
                     {
                         app.clear_input();
                     }
+                    // Ctrl+O: for FORENSICS tools, open a file and load bytes
+                    KeyCode::Char('o')
+                        if key.modifiers.contains(KeyModifiers::CONTROL)
+                            && app.focus == Focus::Input =>
+                    {
+                        if let Some(tool) = app.selected_tool() {
+                            if tool.category == "FORENSICS" {
+                                app.open_file_into_input();
+                            }
+                        }
+                    }
+                    KeyCode::Char(c) if app.focus == Focus::Input && !key.modifiers.contains(KeyModifiers::CONTROL) => app.insert_char(c),
                     KeyCode::Esc if app.focus == Focus::Input => {
                         app.focus = Focus::ToolList;
+                    }
+
+                    // Output selection start/stop (v) and copy (Ctrl+C)
+                    KeyCode::Char('v') if app.focus == Focus::Output => {
+                        if !app.output.is_empty() {
+                            if !app.output_selecting {
+                                // start selection at top visible line
+                                let start = app.output_scroll as usize;
+                                app.output_selecting = true;
+                                app.output_select_start = Some(start);
+                                app.output_select_end = start;
+                                app.status = String::from("Selection started (use ↑/↓ to expand, Ctrl+C to copy)");
+                            } else {
+                                app.output_selecting = false;
+                                app.output_select_start = None;
+                                app.status = String::from("Selection cleared");
+                            }
+                        }
+                    }
+
+                    KeyCode::Char('c')
+                        if key.modifiers.contains(KeyModifiers::CONTROL)
+                            && app.focus == Focus::Output =>
+                    {
+                        // Copy selection if active, otherwise copy full output
+                        if app.output_selecting {
+                            if let Some(start) = app.output_select_start {
+                                let lines: Vec<&str> = app.output.lines().collect();
+                                let a = start.min(app.output_select_end);
+                                let b = start.max(app.output_select_end);
+                                let sel = lines[a..=b].join("\n");
+                                // copy via pbcopy on macOS
+                                if let Ok(mut child) = std::process::Command::new("pbcopy").stdin(std::process::Stdio::piped()).spawn() {
+                                    if let Some(mut stdin) = child.stdin.take() {
+                                        use std::io::Write;
+                                        let _ = stdin.write_all(sel.as_bytes());
+                                    }
+                                }
+                                app.status = format!("Copied {} lines to clipboard", b - a + 1);
+                                app.output_selecting = false;
+                                app.output_select_start = None;
+                            }
+                        } else {
+                            if !app.output.is_empty() {
+                                if let Ok(mut child) = std::process::Command::new("pbcopy").stdin(std::process::Stdio::piped()).spawn() {
+                                    if let Some(mut stdin) = child.stdin.take() {
+                                        use std::io::Write;
+                                        let _ = stdin.write_all(app.output.as_bytes());
+                                    }
+                                }
+                                app.status = String::from("Copied output to clipboard");
+                            }
+                        }
                     }
 
                     _ => {}
@@ -819,54 +1045,83 @@ fn draw_input(f: &mut Frame, app: &App, area: Rect) {
         Style::default().fg(DIM)
     };
 
-    let (label, hint) = app
-        .selected_tool()
-        .map(|t| (t.input_label, t.input_hint))
-        .unwrap_or(("Input", "Select a tool from the left..."));
+    let tool = app.selected_tool();
+    let num_inputs = tool.map(|t| t.inputs.len()).unwrap_or(1);
 
-    let display_text = if app.input.is_empty() && !is_focused {
-        Text::from(Line::from(Span::styled(
-            hint,
-            Style::default().fg(DIM).add_modifier(Modifier::ITALIC),
-        )))
-    } else if is_focused {
-        let before = &app.input[..app.input_cursor];
-        let after = &app.input[app.input_cursor..];
-        Text::from(Line::from(vec![
-            Span::styled(before, Style::default().fg(TEXT)),
-            Span::styled("█", Style::default().fg(ACCENT)),
-            Span::styled(after, Style::default().fg(TEXT)),
-        ]))
-    } else {
-        Text::from(Line::from(Span::styled(&app.input, Style::default().fg(TEXT))))
-    };
+    let block = Block::default()
+        .title(Span::styled(
+            " Input ",
+            Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
+        ))
+        .title_bottom(if is_focused {
+            Line::from(Span::styled(
+                " Enter to run  Tab/↓ to switch fields  Ctrl+U to clear ",
+                Style::default().fg(DIM),
+            ))
+        } else {
+            Line::from(Span::styled(
+                " click or l/r to focus ",
+                Style::default().fg(DIM),
+            ))
+        })
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded)
+        .border_style(border_style)
+        .style(Style::default().bg(SURFACE));
 
-    let input_widget = Paragraph::new(display_text)
-        .block(
-            Block::default()
-                .title(Span::styled(
-                    format!(" {} ", label),
-                    Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
-                ))
-                .title_bottom(if is_focused {
-                    Line::from(Span::styled(
-                        " Enter to run  Ctrl+U to clear  Esc to nav ",
-                        Style::default().fg(DIM),
-                    ))
-                } else {
-                    Line::from(Span::styled(
-                        " click or l to focus ",
-                        Style::default().fg(DIM),
-                    ))
-                })
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded)
-                .border_style(border_style)
-                .style(Style::default().bg(SURFACE)),
-        )
-        .wrap(Wrap { trim: false });
+    let inner_area = block.inner(area);
+    f.render_widget(block, area);
 
-    f.render_widget(input_widget, area);
+    let constraints = vec![Constraint::Min(1); num_inputs];
+    let input_rects = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(constraints)
+        .split(inner_area);
+
+    for i in 0..num_inputs {
+        let (label, hint) = tool
+            .and_then(|t| t.inputs.get(i))
+            .copied()
+            .unwrap_or(("Input", "Select a tool..."));
+
+        let val = app.inputs.get(i).map(|s| s.as_str()).unwrap_or("");
+        let cursor = app.input_cursors.get(i).copied().unwrap_or(0);
+        let field_focused = is_focused && app.focused_input == i;
+
+        let display_text = if val.is_empty() && !field_focused {
+            Text::from(Line::from(vec![
+                Span::styled(format!("{}: ", label), Style::default().fg(DIM)),
+                Span::styled(hint, Style::default().fg(DIM).add_modifier(Modifier::ITALIC)),
+            ]))
+        } else if field_focused {
+            let before = &val[..cursor];
+            let after = &val[cursor..];
+            Text::from(Line::from(vec![
+                Span::styled(format!("{}: ", label), Style::default().fg(ACCENT).add_modifier(Modifier::BOLD)),
+                Span::styled(before, Style::default().fg(TEXT)),
+                Span::styled("█", Style::default().fg(ACCENT)),
+                Span::styled(after, Style::default().fg(TEXT)),
+            ]))
+        } else {
+            Text::from(Line::from(vec![
+                Span::styled(format!("{}: ", label), Style::default().fg(DIM)),
+                Span::styled(val, Style::default().fg(TEXT)),
+            ]))
+        };
+
+        let field_block = Block::default()
+            .style(if field_focused {
+                Style::default().bg(Color::Rgb(25, 25, 40))
+            } else {
+                Style::default()
+            });
+
+        let p = Paragraph::new(display_text)
+            .block(field_block)
+            .wrap(Wrap { trim: false });
+
+        f.render_widget(p, input_rects[i]);
+    }
 }
 
 fn draw_output(f: &mut Frame, app: &App, area: Rect) {
@@ -884,21 +1139,25 @@ fn draw_output(f: &mut Frame, app: &App, area: Rect) {
         )))
     } else {
         let mut lines: Vec<Line> = Vec::new();
-        for line in app.output.lines() {
-            if line.contains("picoCTF{") || line.contains("flag{") || line.contains("CTF{") {
-                lines.push(Line::from(Span::styled(
-                    line.to_string(),
-                    Style::default()
-                        .fg(BG)
-                        .bg(ACCENT)
-                        .add_modifier(Modifier::BOLD),
-                )));
+        for (idx, line) in app.output.lines().enumerate() {
+            let mut style = if line.contains("picoCTF{") || line.contains("flag{") || line.contains("CTF{") {
+                Style::default().fg(BG).bg(ACCENT).add_modifier(Modifier::BOLD)
             } else {
-                lines.push(Line::from(Span::styled(
-                    line.to_string(),
-                    Style::default().fg(TEXT),
-                )));
+                Style::default().fg(TEXT)
+            };
+
+            // Highlight selection region if present
+            if app.output_selecting {
+                if let Some(start) = app.output_select_start {
+                    let a = start.min(app.output_select_end);
+                    let b = start.max(app.output_select_end);
+                    if idx >= a && idx <= b {
+                        style = style.bg(Color::Rgb(50, 50, 80)).fg(ACCENT).add_modifier(Modifier::REVERSED);
+                    }
+                }
             }
+
+            lines.push(Line::from(Span::styled(line.to_string(), style)));
         }
         Text::from(lines)
     };
@@ -911,10 +1170,13 @@ fn draw_output(f: &mut Frame, app: &App, area: Rect) {
                     Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
                 ))
                 .title_bottom(if is_focused {
-                    Line::from(Span::styled(
-                        " j/k or scroll to navigate ",
-                        Style::default().fg(DIM),
-                    ))
+                    Line::from(vec![
+                        Span::styled(" v ", Style::default().fg(ACCENT).add_modifier(Modifier::BOLD)),
+                        Span::styled("select ", Style::default().fg(DIM)),
+                        Span::styled(" Ctrl+C ", Style::default().fg(ACCENT).add_modifier(Modifier::BOLD)),
+                        Span::styled("copy ", Style::default().fg(DIM)),
+                        Span::styled(" ↑/↓ / scroll to nav ", Style::default().fg(DIM)),
+                    ])
                 } else {
                     Line::from(Span::styled(
                         " click or scroll to focus ",

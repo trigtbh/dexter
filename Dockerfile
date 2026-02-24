@@ -23,12 +23,15 @@ WORKDIR /opt/dexter
 COPY scripts/ ./scripts_src/
 COPY main.py   ./main.py
 
-# ── Compile every .rs file in scripts/ into a binary of the same name ─────────
+# ── Compile every .rs file into a binary, and copy every .py script  ──────────
 RUN mkdir -p scripts && \
     for src in scripts_src/*.rs; do \
         name=$(basename "$src" .rs); \
         echo "Compiling $name..."; \
         rustc -O "$src" -o "scripts/$name"; \
+    done; \
+    for src in scripts_src/*.py; do \
+        cp "$src" "scripts/" && chmod +x "scripts/$(basename "$src")"; \
     done
 
 # ── Workspace volume (user drops challenge files here) ────────────────────────
