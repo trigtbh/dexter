@@ -1,0 +1,10 @@
+services:
+  dexter:
+    build: .
+    container_name: dexter-backend
+    ports:
+      - "7777:7777"
+    volumes:
+      # Drop challenge files here — they appear as /workspace inside the container
+      - ./workspace:/workspace
+    restart: unless-stopped
