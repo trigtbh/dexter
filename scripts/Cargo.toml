@@ -1,0 +1,76 @@
+[package]
+name = "dexter-scripts"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+
+[[bin]]
+name = "base64_decode"
+path = "base64_decode.rs"
+
+[[bin]]
+name = "base64_encode"
+path = "base64_encode.rs"
+
+[[bin]]
+name = "binary_decode"
+path = "binary_decode.rs"
+
+[[bin]]
+name = "caesar_brute"
+path = "caesar_brute.rs"
+
+[[bin]]
+name = "hash_identify"
+path = "hash_identify.rs"
+
+[[bin]]
+name = "hex_decode"
+path = "hex_decode.rs"
+
+[[bin]]
+name = "hex_encode"
+path = "hex_encode.rs"
+
+[[bin]]
+name = "lsb_extract"
+path = "lsb_extract.rs"
+
+[[bin]]
+name = "magic_bytes"
+path = "magic_bytes.rs"
+
+[[bin]]
+name = "md5_hash"
+path = "md5_hash.rs"
+
+[[bin]]
+name = "rot13"
+path = "rot13.rs"
+
+[[bin]]
+name = "rsa_decrypt"
+path = "rsa_decrypt.rs"
+
+[[bin]]
+name = "sha256_hash"
+path = "sha256_hash.rs"
+
+[[bin]]
+name = "strings_extract"
+path = "strings_extract.rs"
+
+[[bin]]
+name = "url_decode"
+path = "url_decode.rs"
+
+[[bin]]
+name = "xor_brute"
+path = "xor_brute.rs"
+
+[[bin]]
+name = "xor_key"
+path = "xor_key.rs"

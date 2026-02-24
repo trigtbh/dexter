@@ -165,7 +165,7 @@ def run_tool(req: RunRequest) -> RunResponse:
         "caesar_brute":    lambda i: run_script("caesar_brute", i),
         "xor_brute":       lambda i: run_script("xor_brute", i),
         "xor_key":         lambda i: run_script("xor_key", i),
-        "rsa_decrypt":     lambda i: run_script("rsa_decrypt.py", i),
+        "rsa_decrypt":     lambda i: run_script("rsa_decrypt", i),
         # Forensics — mix of Rust + system tools
         "strings_extract": lambda i: run_script("strings_extract", i),
         "magic_bytes":     lambda i: run_script("magic_bytes", i),
